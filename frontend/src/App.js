@@ -109,11 +109,28 @@ function App() {
     setShowCreateForm(false);
   };
 
+  // const deleteMedicine = async (id) => {
+  //   await axios.delete(`http://localhost:5000/medicines/${id}`);
+  //   setMessage('Medicine deleted successfully!');
+  //   fetchMedicines();
+  // };
+
   const deleteMedicine = async (id) => {
-    await axios.delete(`http://localhost:5000/medicines/${id}`);
-    setMessage('Medicine deleted successfully!');
-    fetchMedicines();
+    try {
+      const response = await axios.delete(`http://localhost:5000/medicines/${id}`);
+      
+      if (response.status === 204) {
+        setMessage('Medicine deleted successfully!');
+        fetchMedicines();  // Fetch updated list of medicines
+      } else {
+        setMessage('Error deleting medicine.');
+      }
+    } catch (error) {
+      console.error('Error deleting medicine:', error);
+      setMessage('Failed to delete medicine.');
+    }
   };
+  
 
   const editMedicineForm = (medicine) => {
     setNewMedicine(medicine);

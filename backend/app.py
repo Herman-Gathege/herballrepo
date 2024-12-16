@@ -233,13 +233,14 @@ def logout():
     session.pop('user_id', None)
     return jsonify({'message': 'Logged out successfully!'}), 200
 
-# CRUD for Medicines
+# Fetch all medicines
 @app.route('/medicines', methods=['GET'])
 def get_medicines():
     medicines = Medicine.query.all()
     medicines_list = [{'id': m.id, 'name': m.name, 'image_url': m.image_url, 'description': m.description, 'prescription': m.prescription} for m in medicines]
     return jsonify(medicines_list), 200
 
+# Add a new medicine
 @app.route('/medicines', methods=['POST'])
 def add_medicine():
     data = request.get_json()
@@ -252,6 +253,36 @@ def add_medicine():
     db.session.add(new_medicine)
     db.session.commit()
     return jsonify({"message": "Medicine added successfully!"}), 201
+
+# Update an existing medicine
+@app.route('/medicines/<int:id>', methods=['PUT'])
+def update_medicine(id):
+    data = request.get_json()
+    medicine = Medicine.query.get(id)
+    
+    if not medicine:
+        return jsonify({"message": "Medicine not found"}), 404
+
+    # Update medicine details
+    medicine.name = data.get('name', medicine.name)
+    medicine.image_url = data.get('image_url', medicine.image_url)
+    medicine.description = data.get('description', medicine.description)
+    medicine.prescription = data.get('prescription', medicine.prescription)
+
+    db.session.commit()
+    return jsonify({"message": "Medicine updated successfully!"}), 200
+
+# Delete a medicine
+@app.route('/medicines/<int:id>', methods=['DELETE'])
+def delete_medicine(id):
+    medicine = Medicine.query.get(id)
+    
+    if not medicine:
+        return jsonify({"message": "Medicine not found"}), 404
+    
+    db.session.delete(medicine)
+    db.session.commit()
+    return '', 204  # No Content as the resource was deleted successfully
 
 # Additional Routes...
 
